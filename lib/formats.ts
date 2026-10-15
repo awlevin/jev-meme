@@ -5,7 +5,6 @@ export type FormatId = "versus" | "lineup" | "vibes" | "spot";
 export type Format = {
   id: FormatId;
   name: string;
-  hint: string;
   minImages: number;
   maxImages: number;
   /** How many prompts the user writes. */
@@ -16,8 +15,7 @@ export type Format = {
 export const FORMATS: Record<FormatId, Format> = {
   versus: {
     id: "versus",
-    name: "Versus",
-    hint: "2 pics",
+    name: "Two pics",
     minImages: 2,
     maxImages: 2,
     maxQuestions: 1,
@@ -26,7 +24,6 @@ export const FORMATS: Record<FormatId, Format> = {
   lineup: {
     id: "lineup",
     name: "Lineup",
-    hint: "3–4 pics",
     minImages: 3,
     maxImages: 4,
     maxQuestions: 1,
@@ -34,8 +31,7 @@ export const FORMATS: Record<FormatId, Format> = {
   },
   vibes: {
     id: "vibes",
-    name: "Vibe check",
-    hint: "Many questions",
+    name: "Many Qs",
     minImages: 1,
     maxImages: 1,
     maxQuestions: 4,
@@ -43,8 +39,7 @@ export const FORMATS: Record<FormatId, Format> = {
   },
   spot: {
     id: "spot",
-    name: "Spot it",
-    hint: "Find a thing",
+    name: "Find it",
     minImages: 1,
     maxImages: 1,
     maxQuestions: 1,

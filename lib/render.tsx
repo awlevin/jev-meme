@@ -86,7 +86,7 @@ function Watermark({ corner = "top-left" }: { corner?: "top-left" | "bottom-righ
         textShadow: "0 1px 4px rgba(0,0,0,0.9)",
       }}
     >
-      jev-meme
+      jevmeme.fun
     </div>
   );
 }

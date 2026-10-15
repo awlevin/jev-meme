@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { FORMAT_IDS, FORMATS, MAX_QUESTION_LENGTH, memeTitle, type FormatId } from "@/lib/formats";
 import { prepPhoto } from "@/lib/prep";
 import { PRESETS, QUESTION_BANK, SAMPLE_PHOTOS, samplePath, SPOT_BANK, type Preset } from "@/lib/samples";
+import { FormatGlyph } from "./format-glyph";
 import { Result } from "./result";
 import { Button } from "./ui/button";
 import { Sheet } from "./ui/sheet";
@@ -24,7 +25,6 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
   const [format, setFormat] = useState<FormatId>("versus");
   const [photos, setPhotos] = useState<(Photo | null)[]>([null, null]);
   const [questions, setQuestions] = useState<string[]>([""]);
-  const [showFormats, setShowFormats] = useState(false);
   const [picking, setPicking] = useState<number | null>(null);
   const [ideas, setIdeas] = useState<{ slot: number; list: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -33,7 +33,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (shown) document.title = `${shown.title} · jev-meme`;
+    if (shown) document.title = `${shown.title} · jevmeme.fun`;
   }, [shown]);
 
   const spec = FORMATS[format];
@@ -80,7 +80,6 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
     setFormat(preset.format);
     setPhotos(Array.from({ length: f.maxImages }, (_, i) => ps[i] ?? null));
     setQuestions(preset.questions);
-    if (preset.format !== "versus") setShowFormats(true);
     void create(preset.format, ps, preset.questions);
   }
 
@@ -121,7 +120,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
     <div ref={top} className="mx-auto flex w-full max-w-xl scroll-mt-4 flex-col gap-6 px-4 pt-4 pb-16">
       <header className="flex items-center justify-between">
         <Link href="/" className="font-mono text-lg font-extrabold tracking-tight">
-          jev<span className="text-accent">-</span>meme
+          jevmeme<span className="text-accent">.fun</span>
         </Link>
         <a href="https://typesafe.ai" target="_blank" rel="noopener" className="text-xs text-muted hover:text-text">
           by Jev
@@ -163,48 +162,27 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
       </section>
 
       <section aria-label="Make your own" className="flex flex-col gap-4 rounded-3xl border border-line bg-surface p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold">Make your own</h2>
-          <button
-            type="button"
-            onClick={() => setShowFormats((v) => !v)}
-            aria-expanded={showFormats}
-            className="flex items-center gap-1 text-sm text-muted hover:text-text"
-          >
-            {spec.name}
-            <svg
-              viewBox="0 0 24 24"
-              className={`size-4 transition ${showFormats ? "rotate-180" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
-        </div>
+        <h2 className="font-semibold">Make your own</h2>
 
-        {showFormats && (
-          <div role="radiogroup" aria-label="Format" className="grid grid-cols-2 gap-2">
-            {FORMAT_IDS.map((id) => (
-              <button
-                key={id}
-                type="button"
-                role="radio"
-                aria-checked={format === id}
-                onClick={() => switchFormat(id)}
-                className={`rounded-2xl border px-3 py-2.5 text-left transition ${
-                  format === id ? "border-accent bg-accent/10" : "border-line hover:border-muted"
-                }`}
-              >
-                <span className="block text-sm font-semibold">{FORMATS[id].name}</span>
-                <span className="block text-xs text-muted">{FORMATS[id].hint}</span>
-              </button>
-            ))}
-          </div>
-        )}
+        <div role="radiogroup" aria-label="Layout" className="grid grid-cols-4 gap-2">
+          {FORMAT_IDS.map((id) => (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={format === id}
+              onClick={() => switchFormat(id)}
+              className={`flex flex-col items-center gap-1.5 rounded-2xl border px-1 pt-2.5 pb-2 transition ${
+                format === id
+                  ? "border-accent bg-accent/10 text-text"
+                  : "border-line text-muted hover:border-muted hover:text-text"
+              }`}
+            >
+              <FormatGlyph id={id} active={format === id} />
+              <span className="text-xs font-semibold whitespace-nowrap">{FORMATS[id].name}</span>
+            </button>
+          ))}
+        </div>
 
         <div
           className={`grid gap-2 ${photos.length === 1 ? "grid-cols-1" : photos.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"}`}
@@ -274,7 +252,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
           {questions.map((q, i) => (
             <div key={i} className="flex flex-col gap-2">
               <div className="flex items-center gap-2 rounded-2xl bg-surface-2 pr-1.5 pl-4 focus-within:ring-2 focus-within:ring-accent">
-                {format === "spot" && <span className="shrink-0 text-muted">Where&apos;s</span>}
+                {format === "spot" && <span className="-mr-1 shrink-0 text-muted">Where&apos;s</span>}
                 <input
                   value={q}
                   onChange={(e) => setQuestion(i, e.target.value)}
@@ -355,16 +333,29 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
         </Button>
       </section>
 
-      <footer className="text-center text-xs text-muted">
-        Scores are Jev&apos;s real confidence.{" "}
-        <a
-          href="https://docs.typesafe.ai/images"
-          target="_blank"
-          rel="noopener"
-          className="underline underline-offset-2 hover:text-text"
-        >
-          How
-        </a>
+      <footer className="flex flex-col items-center gap-1.5 text-xs text-muted">
+        <p>
+          Scores are Jev&apos;s real confidence.{" "}
+          <a
+            href="https://docs.typesafe.ai/images"
+            target="_blank"
+            rel="noopener"
+            className="underline underline-offset-2 hover:text-text"
+          >
+            How
+          </a>
+        </p>
+        <p className="flex gap-3">
+          <a href="https://aaronideas.com" target="_blank" rel="noopener" className="hover:text-text">
+            by aaron
+          </a>
+          <a href="https://x.com/awlevin" target="_blank" rel="noopener" className="hover:text-text">
+            @awlevin
+          </a>
+          <a href="https://github.com/awlevin/jev-meme" target="_blank" rel="noopener" className="hover:text-text">
+            code
+          </a>
+        </p>
       </footer>
 
       <input ref={fileInput} type="file" accept="image/*" hidden onChange={onFile} />

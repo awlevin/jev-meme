@@ -23,7 +23,7 @@ export function Result({ id, title }: { id: string; title: string }) {
 
   async function file() {
     const blob = await (await fetch(src)).blob();
-    return new File([blob], `jev-meme-${id}.png`, { type: "image/png" });
+    return new File([blob], `jevmeme-${id}.png`, { type: "image/png" });
   }
 
   async function share() {
@@ -36,7 +36,7 @@ export function Result({ id, title }: { id: string; title: string }) {
 
   async function save() {
     const url = URL.createObjectURL(await file());
-    const a = Object.assign(document.createElement("a"), { href: url, download: `jev-meme-${id}.png` });
+    const a = Object.assign(document.createElement("a"), { href: url, download: `jevmeme-${id}.png` });
     a.click();
     URL.revokeObjectURL(url);
   }

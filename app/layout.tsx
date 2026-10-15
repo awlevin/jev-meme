@@ -8,9 +8,9 @@ const mono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"], weigh
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "jev-meme",
+  title: "jevmeme.fun",
   description: "AI rates your pics.",
-  openGraph: { siteName: "jev-meme", type: "website" },
+  openGraph: { siteName: "jevmeme.fun", type: "website" },
   twitter: { card: "summary_large_image" },
 };
 

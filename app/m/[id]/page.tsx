@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: PageProps<"/m/[id]">): Promis
   const title = memeTitle(meme);
   const images = [{ url: `/m/${id}/card.png`, width: 1200, height: 630, alt: title }];
   return {
-    title: `${title} · jev-meme`,
+    title: `${title} · jevmeme.fun`,
     description: "Rated by Jev.",
     openGraph: { title, description: "Rated by Jev.", images, url: `/m/${id}` },
     twitter: { card: "summary_large_image", title, description: "Rated by Jev.", images },

@@ -28,9 +28,8 @@ await page.getByRole("img", { name: /good boy/ }).waitFor();
 await imagesLoaded();
 await page.screenshot({ path: `${out}/3-result.png` });
 
-// Spot it with a typed target.
-await page.getByRole("button", { name: "Versus" }).click();
-await page.getByRole("radio", { name: /Spot it/ }).click();
+// Find it with a typed target.
+await page.getByRole("radio", { name: /Find it/ }).click();
 await page.getByRole("button", { name: "Remove pic" }).click();
 await page.getByRole("button", { name: "Add pic" }).first().click();
 await page.getByRole("button", { name: "Messy living room" }).click();
@@ -43,7 +42,7 @@ await page.screenshot({ path: `${out}/5-spot-result.png` });
 
 // Upload a photo into Versus.
 if (upload) {
-  await page.getByRole("radio", { name: /Versus/ }).click();
+  await page.getByRole("radio", { name: /Two pics/ }).click();
   await page.getByRole("button", { name: "Remove pic" }).click();
   await page.getByRole("button", { name: "Add pic" }).first().click();
   await page.screenshot({ path: `${out}/6-picker.png` });
