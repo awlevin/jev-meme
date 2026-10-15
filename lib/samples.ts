@@ -1,9 +1,10 @@
 import type { FormatId } from "./formats";
 
-// Bundled photos (public/samples, made by scripts/gen-samples.mts).
+// Bundled photos (public/samples). Most come from scripts/gen-samples.mts; the
+// beverage pair is cropped from the original meme that inspired this app.
 export const SAMPLE_PHOTOS = [
-  { id: "soda-guy", alt: "Man chugging a soda" },
-  { id: "wine-sip", alt: "Man sipping wine" },
+  { id: "stout-sip", alt: "Man sipping a stout" },
+  { id: "can-chug", alt: "Man chugging a can" },
   { id: "dog-ball", alt: "Dog with a ball" },
   { id: "raccoon-trash", alt: "Raccoon in a trash can" },
   { id: "hotdog", alt: "Hot dog" },
@@ -34,13 +35,17 @@ export type Preset = {
 
 // One-tap examples shown first on the home page.
 export const PRESETS: Preset[] = [
-  { format: "versus", photos: ["wine-sip", "soda-guy"], questions: ["Does he enjoy his beverage?"] },
+  { format: "versus", photos: ["stout-sip", "can-chug"], questions: ["Who loves their beverage more?"] },
   { format: "versus", photos: ["raccoon-trash", "dog-ball"], questions: ["Is this a good boy?"] },
-  { format: "versus", photos: ["hotdog", "taco"], questions: ["Is this a sandwich?"] },
+  { format: "versus", photos: ["hotdog", "taco"], questions: ["Which one is more of a sandwich?"] },
   { format: "versus", photos: ["ladder", "harness"], questions: ["Is this OSHA compliant?"] },
   { format: "versus", photos: ["sneaker", "shoe-cake"], questions: ["Is this cake?"] },
   { format: "versus", photos: ["cat-keyboard", "dog-tie"], questions: ["Ready for Monday?"] },
-  { format: "lineup", photos: ["goose", "duckling", "sloth", "raccoon-trash"], questions: ["Would this win a fight?"] },
+  {
+    format: "lineup",
+    photos: ["goose", "duckling", "sloth", "raccoon-trash"],
+    questions: ["Which would win in a fight?"],
+  },
   {
     format: "vibes",
     photos: ["raccoon-trash"],
@@ -51,6 +56,11 @@ export const PRESETS: Preset[] = [
 
 // Prompts for "Need an idea?".
 export const QUESTION_BANK: string[] = [
+  "Who loves their beverage more?",
+  "Which would win in a fight?",
+  "Who has more aura?",
+  "Which one is more of a sandwich?",
+  "Who is more likely to text back?",
   "Does he enjoy his beverage?",
   "Is this a good boy?",
   "Is this a sandwich?",

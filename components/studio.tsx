@@ -3,7 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { FORMAT_IDS, FORMATS, MAX_QUESTION_LENGTH, memeTitle, type FormatId } from "@/lib/formats";
+import {
+  defaultMode,
+  FORMAT_IDS,
+  FORMATS,
+  hasModes,
+  MAX_QUESTION_LENGTH,
+  memeTitle,
+  type FormatId,
+  type Mode,
+} from "@/lib/formats";
 import { prepPhoto } from "@/lib/prep";
 import { PRESETS, QUESTION_BANK, SAMPLE_PHOTOS, samplePath, SPOT_BANK, type Preset } from "@/lib/samples";
 import { FormatGlyph } from "./format-glyph";
@@ -25,6 +34,8 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
   const [format, setFormat] = useState<FormatId>("versus");
   const [photos, setPhotos] = useState<(Photo | null)[]>([null, null]);
   const [questions, setQuestions] = useState<string[]>([""]);
+  // null = follow the question's wording; set once the user taps a mode.
+  const [modeChoice, setModeChoice] = useState<Mode | null>(null);
   const [picking, setPicking] = useState<number | null>(null);
   const [ideas, setIdeas] = useState<{ slot: number; list: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -39,6 +50,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
   const spec = FORMATS[format];
   const filled = photos.filter((p): p is Photo => p !== null);
   const asked = questions.map((q) => q.trim()).filter(Boolean);
+  const mode: Mode = modeChoice ?? defaultMode(asked[0] ?? "");
   const ready = filled.length >= spec.minImages && asked.length > 0 && !busy;
 
   function switchFormat(next: FormatId) {
@@ -49,13 +61,14 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
     setError(null);
   }
 
-  async function create(f: FormatId, ps: Photo[], qs: string[]) {
+  async function create(f: FormatId, ps: Photo[], qs: string[], m: Mode) {
     setBusy(true);
     setError(null);
     try {
       const body = new FormData();
       body.set("format", f);
       body.set("questions", JSON.stringify(qs));
+      if (hasModes(f)) body.set("mode", m);
       for (const p of ps) {
         if (p.kind === "sample") body.append("photo", `sample:${p.id}`);
         else body.append("photo", p.blob, "photo.jpg");
@@ -80,7 +93,8 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
     setFormat(preset.format);
     setPhotos(Array.from({ length: f.maxImages }, (_, i) => ps[i] ?? null));
     setQuestions(preset.questions);
-    void create(preset.format, ps, preset.questions);
+    setModeChoice(null);
+    void create(preset.format, ps, preset.questions, defaultMode(preset.questions[0]));
   }
 
   function setPhoto(slot: number, photo: Photo | null) {
@@ -255,7 +269,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
                   onChange={(e) => setQuestion(i, e.target.value)}
                   onFocus={() => showIdeas(i)}
                   onBlur={() => setIdeas(null)}
-                  onKeyDown={(e) => e.key === "Enter" && ready && create(format, filled, asked)}
+                  onKeyDown={(e) => e.key === "Enter" && ready && create(format, filled, asked, mode)}
                   placeholder={i === 0 ? spec.placeholder : "Another question?"}
                   maxLength={MAX_QUESTION_LENGTH}
                   enterKeyHint="go"
@@ -312,13 +326,32 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
           )}
         </div>
 
+        {hasModes(format) && (
+          <div role="radiogroup" aria-label="Scoring" className="grid grid-cols-2 gap-1 rounded-2xl bg-surface-2 p-1">
+            {(["each", "pick"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                role="radio"
+                aria-checked={mode === m}
+                onClick={() => setModeChoice(m)}
+                className={`h-9 rounded-xl text-sm font-semibold transition ${
+                  mode === m ? "bg-text text-bg" : "text-muted hover:text-text"
+                }`}
+              >
+                {m === "each" ? "Rate each" : "Pick one"}
+              </button>
+            ))}
+          </div>
+        )}
+
         {error && (
           <p role="alert" className="text-sm text-danger">
             {error}
           </p>
         )}
 
-        <Button variant="primary" size="lg" disabled={!ready} onClick={() => create(format, filled, asked)}>
+        <Button variant="primary" size="lg" disabled={!ready} onClick={() => create(format, filled, asked, mode)}>
           {busy ? (
             <>
               <span className="size-4 animate-spin rounded-full border-2 border-current/30 border-t-current" />

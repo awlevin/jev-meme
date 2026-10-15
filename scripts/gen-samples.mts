@@ -10,10 +10,6 @@ const STYLE =
   "Candid smartphone photo, natural light, realistic, sharp focus, no text, no watermark.";
 
 const PROMPTS: Record<string, string> = {
-  "soda-guy":
-    "A man in his 30s wearing a black hoodie and over-ear headphones, eyes closed in bliss, chugging a silver soda can at an office desk, webcam angle from slightly below, office ceiling tiles.",
-  "wine-sip":
-    "A man in a navy suit at a fancy dim restaurant cautiously sipping red wine from a large glass, visibly unimpressed, slight grimace.",
   "dog-ball":
     "A golden retriever proudly holding a tennis ball in its mouth on green grass in a sunny park, looking straight at the camera.",
   "raccoon-trash":

@@ -27,7 +27,7 @@ export const FORMATS: Record<FormatId, Format> = {
     minImages: 3,
     maxImages: 4,
     maxQuestions: 1,
-    placeholder: "Would this win a fight?",
+    placeholder: "Which would win in a fight?",
   },
   vibes: {
     id: "vibes",
@@ -51,6 +51,19 @@ export const FORMAT_IDS = Object.keys(FORMATS) as FormatId[];
 
 export const MAX_QUESTION_LENGTH = 120;
 
+/** Multi-photo memes either rate each photo alone or make Jev pick between them. */
+export type Mode = "each" | "pick";
+
+export const hasModes = (format: FormatId) => format === "versus" || format === "lineup";
+
+/** "Who loves their beverage more?" reads as a pick; "Is this cake?" reads as rate-each. */
+export function defaultMode(question: string): Mode {
+  const q = question.trim().toLowerCase();
+  if (/^(who|which|whose)\b/.test(q)) return "pick";
+  if (/\b(more|less|better|worse|best|worst|most|least)\b|\w+er than\b/.test(q)) return "pick";
+  return "each";
+}
+
 export type MemeImage = { url: string; width: number; height: number };
 
 export type Box = { top: number; bottom: number; left: number; right: number };
@@ -62,7 +75,9 @@ export type Meme = {
   format: FormatId;
   questions: string[];
   images: MemeImage[];
-  /** versus/lineup: one score per image. vibes: one score per question. */
+  /** versus/lineup only; absent means "each". */
+  mode?: Mode;
+  /** versus/lineup: one score per image ("pick" scores sum to 1). vibes: one score per question. */
   scores: number[];
   /** spot only. */
   box?: { edges: Box; confidence: number | null };

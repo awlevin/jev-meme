@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/banner.png" alt="jevmeme.fun, roasts by jev. A two-photo meme asks 'Does he enjoy his beverage?': the man sniffing red wine scores 0.12, the man chugging a can at his desk scores 0.81." width="900">
+  <img src="assets/brand/banner.png" alt="jevmeme.fun, roasts by jev. A two-photo meme asks 'Who loves their beverage more?': the man sipping a stout scores 0.26, the man chugging a can scores 0.74." width="900">
 </p>
 
 <p align="center">

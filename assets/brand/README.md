@@ -6,7 +6,7 @@ preview. `banner.html` is the source. It uses the same tokens as
 needs a network connection.
 
 `meme.jpg` is a real meme from the app:
-[jevmeme.fun/m/-y0r88XnjcRf](https://jevmeme.fun/m/-y0r88XnjcRf).
+[jevmeme.fun/m/5x6pgyLCOe3e](https://jevmeme.fun/m/5x6pgyLCOe3e).
 
 ```bash
 node assets/brand/render.mjs   # banner.html → assets/brand/banner.png

@@ -49,7 +49,10 @@ if (upload) {
   await page.locator('input[type="file"]').setInputFiles(upload);
   await page.getByRole("button", { name: "Add pic" }).first().click();
   await page.getByRole("button", { name: "Dog with a ball" }).click();
-  await page.getByRole("textbox", { name: "Question" }).fill("Is he hydrated?");
+  await page.getByRole("textbox", { name: "Question" }).fill("Who is more hydrated?");
+  // Comparative wording flips scoring to "Pick one" on its own.
+  await page.getByRole("radio", { name: "Pick one", checked: true }).waitFor();
+  await page.screenshot({ path: `${out}/6b-pick-compose.png`, fullPage: true });
   await page.getByRole("button", { name: "Ask Jev" }).click();
   await page.getByRole("img", { name: /hydrated/ }).waitFor();
   await imagesLoaded();

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { APIError } from "@typesafe-ai/sdk";
-import { FORMATS, MAX_QUESTION_LENGTH, type FormatId, type Meme, type MemeImage } from "@/lib/formats";
+import { FORMATS, hasModes, MAX_QUESTION_LENGTH, type FormatId, type Meme, type MemeImage } from "@/lib/formats";
 import { judge, MODEL } from "@/lib/jev";
 import { loadPhoto, photoSize } from "@/lib/photos";
 import { SAMPLE_IDS, samplePath } from "@/lib/samples";
@@ -52,6 +52,8 @@ export async function POST(request: Request) {
   if (questions.length > format.maxQuestions) return fail("Too many questions.");
   if (questions.some((q) => q.length > MAX_QUESTION_LENGTH)) return fail("Keep it shorter.");
 
+  const mode = hasModes(format.id) && form.get("mode") === "pick" ? "pick" : undefined;
+
   const entries = form.getAll("photo");
   if (entries.length < format.minImages || entries.length > format.maxImages) return fail("Wrong number of pics.");
   const photos: Photo[] = [];
@@ -61,12 +63,19 @@ export async function POST(request: Request) {
     photos.push(photo);
   }
 
-  const id = sha(JSON.stringify([format.id, questions, MODEL, photos.map((p) => p.key)])).slice(0, 12);
+  // "each" memes keep the original key shape so their ids stay stable.
+  const key = [format.id, questions, MODEL, photos.map((p) => p.key), ...(mode ? [mode] : [])];
+  const id = sha(JSON.stringify(key)).slice(0, 12);
   if (await memeExists(id)) return Response.json({ id });
 
   let judgment;
   try {
-    judgment = await judge(format.id, photos.map((p) => p.bytes), questions);
+    judgment = await judge(
+      format.id,
+      photos.map((p) => p.bytes),
+      questions,
+      mode,
+    );
   } catch (error) {
     console.error("jev failed", error);
     if (error instanceof APIError && error.status === 400) return fail("Jev can't read that pic.");
@@ -86,6 +95,7 @@ export async function POST(request: Request) {
     id,
     format: format.id,
     questions,
+    mode,
     images,
     scores: judgment.scores,
     box: judgment.box,
