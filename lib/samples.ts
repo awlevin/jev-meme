@@ -1,4 +1,4 @@
-import type { FormatId } from "./formats";
+import type { FormatId, Mode } from "./formats";
 
 // Bundled photos (public/samples). Most come from scripts/gen-samples.mts; the
 // beverage pair is cropped from the original meme that inspired this app.
@@ -35,9 +35,9 @@ export type Preset = {
 
 // One-tap examples shown first on the home page.
 export const PRESETS: Preset[] = [
-  { format: "versus", photos: ["stout-sip", "can-chug"], questions: ["Who loves their beverage more?"] },
   { format: "versus", photos: ["raccoon-trash", "dog-ball"], questions: ["Is this a good boy?"] },
   { format: "versus", photos: ["hotdog", "taco"], questions: ["Which one is more of a sandwich?"] },
+  { format: "versus", photos: ["stout-sip", "can-chug"], questions: ["Who loves their beverage more?"] },
   { format: "versus", photos: ["ladder", "harness"], questions: ["Is this OSHA compliant?"] },
   { format: "versus", photos: ["sneaker", "shoe-cake"], questions: ["Is this cake?"] },
   { format: "versus", photos: ["cat-keyboard", "dog-tie"], questions: ["Ready for Monday?"] },
@@ -54,37 +54,47 @@ export const PRESETS: Preset[] = [
   { format: "spot", photos: ["messy-room"], questions: ["the cat"] },
 ];
 
-// Prompts for "Need an idea?".
-export const QUESTION_BANK: string[] = [
-  "Who loves their beverage more?",
-  "Which would win in a fight?",
-  "Who has more aura?",
-  "Which one is more of a sandwich?",
-  "Who is more likely to text back?",
-  "Who is having a worse day?",
-  "Which one is more cursed?",
-  "Who would survive a zombie apocalypse?",
-  "Who is the main character?",
-  "Does he enjoy his beverage?",
-  "Is this a good boy?",
-  "Is this a sandwich?",
-  "Is this OSHA compliant?",
-  "Ready for Monday?",
-  "Would you trust them with your dog?",
-  "Is this main character energy?",
-  "Did they peak in high school?",
-  "Is this a cry for help?",
-  "Would this survive a group chat?",
-  "Is this person about to send a risky text?",
-  "Is this legal?",
-  "Does this spark joy?",
-  "Is this a red flag?",
-  "Would Gordon Ramsay approve?",
-  "Is this guy a landlord?",
-  "Is this a hate crime against food?",
-  "Is this a crime?",
-  "Is this peak performance?",
-  "Has this person ever touched grass?",
+// Idea prompts as [Rate each, Pick one] pairs, so switching modes can rewrite
+// the question. Each side must read as its own mode to defaultMode().
+export const QUESTION_PAIRS: [each: string, pick: string][] = [
+  ["Is this a good boy?", "Who is the better boy?"],
+  ["Is this a sandwich?", "Which one is more of a sandwich?"],
+  ["Does he enjoy his beverage?", "Who loves their beverage more?"],
+  ["Is this OSHA compliant?", "Which one is more OSHA compliant?"],
+  ["Is this cake?", "Which one is cake?"],
+  ["Ready for Monday?", "Who is more ready for Monday?"],
+  ["Would this win a fight?", "Which would win in a fight?"],
+  ["Does this have aura?", "Who has more aura?"],
+  ["Would they text back?", "Who is more likely to text back?"],
+  ["Is this person having a bad day?", "Who is having a worse day?"],
+  ["Is this cursed?", "Which one is more cursed?"],
+  ["Would this survive a zombie apocalypse?", "Who would survive a zombie apocalypse?"],
+  ["Is this main character energy?", "Who is the main character?"],
+  ["Would you trust them with your dog?", "Who would you trust with your dog?"],
+  ["Did they peak in high school?", "Who peaked in high school?"],
+  ["Is this a cry for help?", "Which one is more of a cry for help?"],
+  ["Would this survive a group chat?", "Which would survive the group chat?"],
+  ["Is this person about to send a risky text?", "Who is about to send a risky text?"],
+  ["Is this legal?", "Which one is less legal?"],
+  ["Does this spark joy?", "Which one sparks more joy?"],
+  ["Is this a red flag?", "Which one is the bigger red flag?"],
+  ["Would Gordon Ramsay approve?", "Which would Gordon Ramsay approve of?"],
+  ["Is this guy a landlord?", "Who is the landlord?"],
+  ["Is this a hate crime against food?", "Which one is a worse crime against food?"],
+  ["Is this a flex?", "Which one is the bigger flex?"],
+  ["Is this peak performance?", "Which one is peak performance?"],
+  ["Has this person ever touched grass?", "Who has touched more grass?"],
 ];
+
+export const QUESTION_BANK: Record<Mode, string[]> = {
+  each: QUESTION_PAIRS.map(([each]) => each),
+  pick: QUESTION_PAIRS.map(([, pick]) => pick),
+};
+
+/** The same idea in the other mode, if `question` is one of ours. */
+export function counterpart(question: string, to: Mode): string | undefined {
+  const pair = QUESTION_PAIRS.find((p) => p.includes(question.trim()));
+  return pair?.[to === "each" ? 0 : 1];
+}
 
 export const SPOT_BANK = ["the cat", "the dog", "Waldo", "the remote", "my keys", "the problem"];

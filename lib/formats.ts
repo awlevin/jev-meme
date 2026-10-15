@@ -22,7 +22,7 @@ export const FORMATS: Record<FormatId, Format> = {
     maxImages: 2,
     maxQuestions: 1,
     placeholder: "Does he enjoy his beverage?",
-    pickPlaceholder: "Who enjoys their beverage more?",
+    pickPlaceholder: "Who loves their beverage more?",
   },
   lineup: {
     id: "lineup",

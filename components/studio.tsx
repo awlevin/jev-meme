@@ -14,7 +14,7 @@ import {
   type Mode,
 } from "@/lib/formats";
 import { prepPhoto } from "@/lib/prep";
-import { PRESETS, QUESTION_BANK, SAMPLE_PHOTOS, samplePath, SPOT_BANK, type Preset } from "@/lib/samples";
+import { counterpart, PRESETS, QUESTION_BANK, SAMPLE_PHOTOS, samplePath, SPOT_BANK, type Preset } from "@/lib/samples";
 import { FormatGlyph } from "./format-glyph";
 import { Result } from "./result";
 import { Button } from "./ui/button";
@@ -116,11 +116,15 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
     }
   }
 
+  function switchMode(next: Mode) {
+    setModeChoice(next);
+    setQuestions((prev) => prev.map((q, i) => (i === 0 ? (counterpart(q, next) ?? q) : q)));
+  }
+
   // Ideas match the format, and for multi-photo formats the current mode.
   function ideaBank() {
     if (format === "spot") return SPOT_BANK;
-    if (!hasModes(format)) return QUESTION_BANK.filter((q) => defaultMode(q) === "each");
-    return QUESTION_BANK.filter((q) => defaultMode(q) === mode);
+    return QUESTION_BANK[hasModes(format) ? mode : "each"];
   }
 
   function showIdeas(slot: number) {
@@ -347,7 +351,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
                 type="button"
                 role="radio"
                 aria-checked={mode === m}
-                onClick={() => setModeChoice(m)}
+                onClick={() => switchMode(m)}
                 className={`h-9 rounded-xl text-sm font-semibold transition ${
                   mode === m ? "bg-text text-bg" : "text-muted hover:text-text"
                 }`}
