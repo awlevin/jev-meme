@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { Studio } from "@/components/studio";
 import { memeTitle } from "@/lib/formats";
 import { loadMeme } from "@/lib/store";
@@ -18,8 +19,15 @@ export async function generateMetadata({ params }: PageProps<"/m/[id]">): Promis
   };
 }
 
-export default async function MemePage({ params }: PageProps<"/m/[id]">) {
-  const { id } = await params;
+export default function MemePage({ params }: PageProps<"/m/[id]">) {
+  return (
+    <Suspense fallback={<Studio initial="loading" />}>
+      {params.then(({ id }) => <Shown id={id} />)}
+    </Suspense>
+  );
+}
+
+async function Shown({ id }: { id: string }) {
   const meme = await loadMeme(id);
   if (!meme) notFound();
   return <Studio initial={{ id, title: memeTitle(meme) }} />;

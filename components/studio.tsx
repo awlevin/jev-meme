@@ -20,8 +20,8 @@ const pick = <T,>(list: readonly T[], not?: T) => {
   return pool[Math.floor(Math.random() * pool.length)];
 };
 
-export function Studio({ initial }: { initial?: Shown }) {
-  const [shown, setShown] = useState<Shown | undefined>(initial);
+export function Studio({ initial }: { initial?: Shown | "loading" }) {
+  const [shown, setShown] = useState<Shown | undefined>(initial === "loading" ? undefined : initial);
   const [format, setFormat] = useState<FormatId>("versus");
   const [photos, setPhotos] = useState<(Photo | null)[]>([null, null]);
   const [questions, setQuestions] = useState<string[]>([""]);
@@ -121,6 +121,8 @@ export function Studio({ initial }: { initial?: Shown }) {
 
       {shown ? (
         <Result id={shown.id} title={shown.title} />
+      ) : initial === "loading" ? (
+        <div className="shimmer aspect-[1200/760] w-full rounded-2xl" />
       ) : (
         <h1 className="text-[2rem] leading-tight font-extrabold tracking-tight text-balance">
           AI rates your pics.

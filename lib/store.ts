@@ -1,5 +1,6 @@
 import "server-only";
 import { BlobNotFoundError, get, head, put } from "@vercel/blob";
+import { cacheLife } from "next/cache";
 import type { Meme } from "./formats";
 
 const memePath = (id: string) => `memes/${id}.json`;
@@ -8,8 +9,19 @@ export const isMemeId = (id: string) => /^[A-Za-z0-9_-]{12}$/.test(id);
 
 export async function loadMeme(id: string): Promise<Meme | null> {
   if (!isMemeId(id)) return null;
+  try {
+    return await fetchMeme(id);
+  } catch {
+    return null;
+  }
+}
+
+// Memes never change once written. Throwing on a miss keeps misses out of the cache.
+async function fetchMeme(id: string): Promise<Meme> {
+  "use cache";
+  cacheLife("max");
   const res = await get(memePath(id), { access: "public" });
-  if (!res || res.statusCode !== 200) return null;
+  if (!res || res.statusCode !== 200) throw new Error(`No meme ${id}`);
   return (await new Response(res.stream).json()) as Meme;
 }
 
