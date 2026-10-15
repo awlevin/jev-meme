@@ -22,9 +22,9 @@ await page.getByRole("textbox", { name: "Question" }).focus();
 await page.screenshot({ path: `${out}/2-ideas.png`, fullPage: true });
 
 // Preset → result page.
-await page.getByRole("region", { name: "Examples" }).getByRole("button", { name: /Is this a good boy/ }).click();
+await page.getByRole("region", { name: "Examples" }).getByRole("button", { name: /best boy/ }).click();
 await page.waitForURL(/\/m\//);
-await page.getByRole("img", { name: /good boy/ }).waitFor();
+await page.getByRole("img", { name: /best boy/ }).waitFor();
 await imagesLoaded();
 await page.screenshot({ path: `${out}/3-result.png` });
 

@@ -35,7 +35,7 @@ export type Preset = {
 
 // One-tap examples shown first on the home page.
 export const PRESETS: Preset[] = [
-  { format: "versus", photos: ["raccoon-trash", "dog-ball"], questions: ["Is this a good boy?"] },
+  { format: "versus", photos: ["raccoon-trash", "dog-ball"], questions: ["Who is the best boy?"] },
   { format: "versus", photos: ["hotdog", "taco"], questions: ["Which one is more of a sandwich?"] },
   { format: "versus", photos: ["stout-sip", "can-chug"], questions: ["Who loves their beverage more?"] },
   { format: "versus", photos: ["ladder", "harness"], questions: ["Is this OSHA compliant?"] },
@@ -57,7 +57,7 @@ export const PRESETS: Preset[] = [
 // Idea prompts as [Rate each, Pick one] pairs, so switching modes can rewrite
 // the question. Each side must read as its own mode to defaultMode().
 export const QUESTION_PAIRS: [each: string, pick: string][] = [
-  ["Is this a good boy?", "Who is the better boy?"],
+  ["Is this a good boy?", "Who is the best boy?"],
   ["Is this a sandwich?", "Which one is more of a sandwich?"],
   ["Does he enjoy his beverage?", "Who loves their beverage more?"],
   ["Is this OSHA compliant?", "Which one is more OSHA compliant?"],
