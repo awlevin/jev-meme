@@ -17,7 +17,7 @@ export const FORMATS: Record<FormatId, Format> = {
   versus: {
     id: "versus",
     name: "Versus",
-    hint: "Two pics, one question.",
+    hint: "2 pics",
     minImages: 2,
     maxImages: 2,
     maxQuestions: 1,
@@ -26,7 +26,7 @@ export const FORMATS: Record<FormatId, Format> = {
   lineup: {
     id: "lineup",
     name: "Lineup",
-    hint: "Up to four pics.",
+    hint: "3–4 pics",
     minImages: 3,
     maxImages: 4,
     maxQuestions: 1,
@@ -35,7 +35,7 @@ export const FORMATS: Record<FormatId, Format> = {
   vibes: {
     id: "vibes",
     name: "Vibe check",
-    hint: "One pic, many questions.",
+    hint: "Many questions",
     minImages: 1,
     maxImages: 1,
     maxQuestions: 4,
@@ -44,7 +44,7 @@ export const FORMATS: Record<FormatId, Format> = {
   spot: {
     id: "spot",
     name: "Spot it",
-    hint: "Jev finds it.",
+    hint: "Find a thing",
     minImages: 1,
     maxImages: 1,
     maxQuestions: 1,

@@ -4,7 +4,7 @@ import { FORMATS, MAX_QUESTION_LENGTH, type FormatId, type Meme, type MemeImage 
 import { judge, MODEL } from "@/lib/jev";
 import { loadPhoto, photoSize } from "@/lib/photos";
 import { SAMPLE_IDS, samplePath } from "@/lib/samples";
-import { loadMeme, saveMeme, saveUpload } from "@/lib/store";
+import { memeExists, saveMeme, saveUpload } from "@/lib/store";
 
 const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
   }
 
   const id = sha(JSON.stringify([format.id, questions, MODEL, photos.map((p) => p.key)])).slice(0, 12);
-  if (await loadMeme(id)) return Response.json({ id });
+  if (await memeExists(id)) return Response.json({ id });
 
   let judgment;
   try {

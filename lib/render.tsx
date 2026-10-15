@@ -72,14 +72,14 @@ function Caption({ text }: { text: string }) {
   );
 }
 
-function Watermark() {
+function Watermark({ corner = "top-left" }: { corner?: "top-left" | "bottom-right" }) {
+  const at = corner === "top-left" ? { left: 14, top: 12 } : { right: 14, bottom: 12 };
   return (
     <div
       style={{
         display: "flex",
         position: "absolute",
-        left: 14,
-        top: 12,
+        ...at,
         fontFamily: "Mono",
         fontSize: 20,
         color: "rgba(255,255,255,0.8)",
@@ -194,7 +194,7 @@ function drawSpot(meme: Meme, src: string): Drawn {
         <div style={{ display: "flex", position: "relative", width, height: photoH, overflow: "hidden", borderRadius: 6 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={src} width={width} height={photoH} style={{ objectFit: "cover", width, height: photoH }} alt="" />
-          <Watermark />
+          <Watermark corner="bottom-right" />
           <div
             style={{
               display: "flex",

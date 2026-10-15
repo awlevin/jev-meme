@@ -73,7 +73,7 @@ export function Result({ id, title }: { id: string; title: string }) {
           <Button onClick={save} size="lg" className="flex-1">Save</Button>
         )}
         <Button onClick={copyLink} size="lg" className="flex-1" aria-live="polite">
-          {copied ? "Copied" : "Copy link"}
+          {copied ? "Copied" : "Link"}
         </Button>
       </div>
     </section>

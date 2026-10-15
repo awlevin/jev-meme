@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FORMAT_IDS, FORMATS, MAX_QUESTION_LENGTH, memeTitle, type FormatId } from "@/lib/formats";
@@ -13,8 +14,6 @@ type Photo = { kind: "sample"; id: string } | { kind: "upload"; blob: Blob; prev
 
 type Shown = { id: string; title: string };
 
-const photoSrc = (p: Photo) => (p.kind === "sample" ? samplePath(p.id) : p.preview);
-
 const pick = <T,>(list: readonly T[], not?: T) => {
   const pool = list.filter((x) => x !== not);
   return pool[Math.floor(Math.random() * pool.length)];
@@ -27,6 +26,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
   const [questions, setQuestions] = useState<string[]>([""]);
   const [showFormats, setShowFormats] = useState(false);
   const [picking, setPicking] = useState<number | null>(null);
+  const [ideas, setIdeas] = useState<{ slot: number; list: string[] } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const top = useRef<HTMLDivElement>(null);
@@ -103,6 +103,15 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
     }
   }
 
+  function showIdeas(slot: number) {
+    const bank = format === "spot" ? SPOT_BANK : QUESTION_BANK;
+    setIdeas({ slot, list: [...bank].sort(() => Math.random() - 0.5).slice(0, 4) });
+  }
+
+  function setQuestion(i: number, value: string) {
+    setQuestions((prev) => prev.map((x, j) => (j === i ? value : x)));
+  }
+
   function roll(i: number) {
     const bank = format === "spot" ? SPOT_BANK : QUESTION_BANK;
     setQuestions((prev) => prev.map((q, j) => (j === i ? pick(bank, q) : q)));
@@ -124,14 +133,12 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
       ) : initial === "loading" ? (
         <div className="shimmer aspect-[1200/760] w-full rounded-2xl" />
       ) : (
-        <h1 className="text-[2rem] leading-tight font-extrabold tracking-tight text-balance">
-          AI rates your pics.
-        </h1>
+        <h1 className="text-[2rem] leading-tight font-extrabold tracking-tight text-balance">AI rates your pics.</h1>
       )}
 
       <section aria-label="Examples" className="-mx-4">
         <h2 className="px-4 pb-2 text-sm font-semibold text-muted">{shown ? "Try another" : "Tap one"}</h2>
-        <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1">
+        <div className="no-scrollbar flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-1">
           {PRESETS.map((preset) => (
             <button
               key={preset.questions[0] + preset.photos.join()}
@@ -142,8 +149,9 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
             >
               <div className="flex h-24 gap-0.5 bg-black">
                 {preset.photos.slice(0, 2).map((id) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={id} src={samplePath(id)} alt="" className="h-full min-w-0 flex-1 object-cover" />
+                  <div key={id} className="relative min-w-0 flex-1">
+                    <Image src={samplePath(id)} alt="" fill sizes="80px" className="object-cover" />
+                  </div>
                 ))}
               </div>
               <span className="line-clamp-2 px-3 py-2 text-sm leading-snug font-semibold">
@@ -164,7 +172,15 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
             className="flex items-center gap-1 text-sm text-muted hover:text-text"
           >
             {spec.name}
-            <svg viewBox="0 0 24 24" className={`size-4 transition ${showFormats ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              viewBox="0 0 24 24"
+              className={`size-4 transition ${showFormats ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M6 9l6 6 6-6" />
             </svg>
           </button>
@@ -190,20 +206,42 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
           </div>
         )}
 
-        <div className={`grid gap-2 ${photos.length === 1 ? "grid-cols-1" : photos.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"}`}>
+        <div
+          className={`grid gap-2 ${photos.length === 1 ? "grid-cols-1" : photos.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"}`}
+        >
           {photos.map((photo, i) => (
-            <div key={i} className={`relative overflow-hidden rounded-2xl bg-surface-2 ${photos.length === 1 ? "aspect-[4/3]" : "aspect-square"}`}>
+            <div
+              key={i}
+              className={`relative overflow-hidden rounded-2xl bg-surface-2 ${photos.length === 1 ? "aspect-[4/3]" : "aspect-square"}`}
+            >
               {photo ? (
                 <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={photoSrc(photo)} alt="" className="size-full object-cover" />
+                  {photo.kind === "sample" ? (
+                    <Image
+                      src={samplePath(photo.id)}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 50vw, 280px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={photo.preview} alt="" className="size-full object-cover" />
+                  )}
                   <button
                     type="button"
                     onClick={() => setPhoto(i, null)}
                     aria-label="Remove pic"
                     className="absolute top-2 right-2 grid size-8 place-items-center rounded-full bg-black/70 text-white backdrop-blur hover:bg-black"
                   >
-                    <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="size-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    >
                       <path d="M6 6l12 12M18 6L6 18" />
                     </svg>
                   </button>
@@ -215,7 +253,14 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
                   className="flex size-full flex-col items-center justify-center gap-1 border-2 border-dashed border-line text-muted transition hover:border-muted hover:text-text"
                   style={{ borderRadius: "inherit" }}
                 >
-                  <svg viewBox="0 0 24 24" className="size-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-7"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
                     <path d="M12 5v14M5 12h14" />
                   </svg>
                   <span className="text-sm font-medium">{i < spec.minImages ? "Add pic" : "Optional"}</span>
@@ -227,32 +272,58 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
 
         <div className="flex flex-col gap-2">
           {questions.map((q, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-2xl bg-surface-2 pr-1.5 pl-4 focus-within:ring-2 focus-within:ring-accent">
-              {format === "spot" && <span className="shrink-0 text-muted">Where&apos;s</span>}
-              <input
-                value={q}
-                onChange={(e) => setQuestions((prev) => prev.map((x, j) => (j === i ? e.target.value : x)))}
-                onKeyDown={(e) => e.key === "Enter" && ready && create(format, filled, asked)}
-                placeholder={i === 0 ? spec.placeholder : "Another question?"}
-                maxLength={MAX_QUESTION_LENGTH}
-                enterKeyHint="go"
-                aria-label={format === "spot" ? "What to find" : "Question"}
-                className="h-13 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted/70"
-              />
-              <button
-                type="button"
-                onClick={() => roll(i)}
-                aria-label="Random idea"
-                title="Random idea"
-                className="grid size-10 shrink-0 place-items-center rounded-xl text-muted transition hover:bg-line hover:text-text active:rotate-90"
-              >
-                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
-                  <rect x="3.5" y="3.5" width="17" height="17" rx="4" />
-                  <circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none" />
-                  <circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none" />
-                  <circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none" />
-                </svg>
-              </button>
+            <div key={i} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 rounded-2xl bg-surface-2 pr-1.5 pl-4 focus-within:ring-2 focus-within:ring-accent">
+                {format === "spot" && <span className="shrink-0 text-muted">Where&apos;s</span>}
+                <input
+                  value={q}
+                  onChange={(e) => setQuestion(i, e.target.value)}
+                  onFocus={() => showIdeas(i)}
+                  onBlur={() => setIdeas(null)}
+                  onKeyDown={(e) => e.key === "Enter" && ready && create(format, filled, asked)}
+                  placeholder={i === 0 ? spec.placeholder : "Another question?"}
+                  maxLength={MAX_QUESTION_LENGTH}
+                  enterKeyHint="go"
+                  aria-label={format === "spot" ? "What to find" : "Question"}
+                  className="h-13 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted/70"
+                />
+                <button
+                  type="button"
+                  onClick={() => roll(i)}
+                  aria-label="Random idea"
+                  title="Random idea"
+                  className="grid size-10 shrink-0 place-items-center rounded-xl text-muted transition hover:bg-line hover:text-text active:rotate-90"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3.5" y="3.5" width="17" height="17" rx="4" />
+                    <circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none" />
+                    <circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none" />
+                    <circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none" />
+                  </svg>
+                </button>
+              </div>
+              {ideas?.slot === i && !q.trim() && (
+                <div className="flex flex-wrap gap-1.5">
+                  {ideas.list.map((idea) => (
+                    <button
+                      key={idea}
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => setQuestion(i, idea)}
+                      className="rounded-full border border-line px-3 py-1.5 text-sm text-muted transition hover:border-muted hover:text-text"
+                    >
+                      {idea}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
           {questions.length < spec.maxQuestions && (
@@ -286,7 +357,12 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
 
       <footer className="text-center text-xs text-muted">
         Scores are Jev&apos;s real confidence.{" "}
-        <a href="https://docs.typesafe.ai/images" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-text">
+        <a
+          href="https://docs.typesafe.ai/images"
+          target="_blank"
+          rel="noopener"
+          className="underline underline-offset-2 hover:text-text"
+        >
           How
         </a>
       </footer>
@@ -306,10 +382,9 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
                 if (picking !== null) setPhoto(picking, { kind: "sample", id: p.id });
                 setPicking(null);
               }}
-              className="aspect-square overflow-hidden rounded-xl transition hover:opacity-80 active:scale-95"
+              className="relative aspect-square overflow-hidden rounded-xl transition hover:opacity-80 active:scale-95"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={samplePath(p.id)} alt={p.alt} className="size-full object-cover" />
+              <Image src={samplePath(p.id)} alt={p.alt} fill sizes="100px" className="object-cover" />
             </button>
           ))}
         </div>

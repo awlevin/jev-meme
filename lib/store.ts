@@ -20,9 +20,20 @@ export async function loadMeme(id: string): Promise<Meme | null> {
 async function fetchMeme(id: string): Promise<Meme> {
   "use cache";
   cacheLife("max");
-  const res = await get(memePath(id), { access: "public" });
+  // Skip the CDN: it can hold a 404 from before the meme existed.
+  const res = await get(memePath(id), { access: "public", useCache: false });
   if (!res || res.statusCode !== 200) throw new Error(`No meme ${id}`);
   return (await new Response(res.stream).json()) as Meme;
+}
+
+export async function memeExists(id: string): Promise<boolean> {
+  try {
+    await head(memePath(id));
+    return true;
+  } catch (error) {
+    if (error instanceof BlobNotFoundError) return false;
+    throw error;
+  }
 }
 
 export async function saveMeme(meme: Meme): Promise<void> {
