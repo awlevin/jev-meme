@@ -116,8 +116,15 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
     }
   }
 
+  // Ideas match the format, and for multi-photo formats the current mode.
+  function ideaBank() {
+    if (format === "spot") return SPOT_BANK;
+    if (!hasModes(format)) return QUESTION_BANK.filter((q) => defaultMode(q) === "each");
+    return QUESTION_BANK.filter((q) => defaultMode(q) === mode);
+  }
+
   function showIdeas(slot: number) {
-    const bank = format === "spot" ? SPOT_BANK : QUESTION_BANK;
+    const bank = ideaBank();
     setIdeas({ slot, list: [...bank].sort(() => Math.random() - 0.5).slice(0, 4) });
   }
 
@@ -126,7 +133,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
   }
 
   function roll(i: number) {
-    const bank = format === "spot" ? SPOT_BANK : QUESTION_BANK;
+    const bank = ideaBank();
     setQuestions((prev) => prev.map((q, j) => (j === i ? pick(bank, q) : q)));
   }
 
@@ -270,7 +277,13 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
                   onFocus={() => showIdeas(i)}
                   onBlur={() => setIdeas(null)}
                   onKeyDown={(e) => e.key === "Enter" && ready && create(format, filled, asked, mode)}
-                  placeholder={i === 0 ? spec.placeholder : "Another question?"}
+                  placeholder={
+                    i > 0
+                      ? "Another question?"
+                      : mode === "pick" && spec.pickPlaceholder
+                        ? spec.pickPlaceholder
+                        : spec.placeholder
+                  }
                   maxLength={MAX_QUESTION_LENGTH}
                   enterKeyHint="go"
                   aria-label={format === "spot" ? "What to find" : "Question"}

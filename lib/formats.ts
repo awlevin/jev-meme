@@ -10,6 +10,8 @@ export type Format = {
   /** How many prompts the user writes. */
   maxQuestions: number;
   placeholder: string;
+  /** Placeholder in "Pick one" mode, for formats that have modes. */
+  pickPlaceholder?: string;
 };
 
 export const FORMATS: Record<FormatId, Format> = {
@@ -20,6 +22,7 @@ export const FORMATS: Record<FormatId, Format> = {
     maxImages: 2,
     maxQuestions: 1,
     placeholder: "Does he enjoy his beverage?",
+    pickPlaceholder: "Who enjoys their beverage more?",
   },
   lineup: {
     id: "lineup",
@@ -27,7 +30,8 @@ export const FORMATS: Record<FormatId, Format> = {
     minImages: 3,
     maxImages: 4,
     maxQuestions: 1,
-    placeholder: "Which would win in a fight?",
+    placeholder: "Would this win a fight?",
+    pickPlaceholder: "Which would win in a fight?",
   },
   vibes: {
     id: "vibes",
