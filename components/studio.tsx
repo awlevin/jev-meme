@@ -346,7 +346,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
         <Button variant="primary" size="lg" disabled={!ready} onClick={() => create(format, filled, asked)}>
           {busy ? (
             <>
-              <span className="size-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+              <span className="size-4 animate-spin rounded-full border-2 border-current/30 border-t-current" />
               Asking Jev…
             </>
           ) : (
