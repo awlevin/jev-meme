@@ -122,9 +122,6 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
         <Link href="/" className="font-mono text-lg font-extrabold tracking-tight">
           jevmeme<span className="text-accent">.fun</span>
         </Link>
-        <a href="https://typesafe.ai" target="_blank" rel="noopener" className="text-xs text-muted hover:text-text">
-          by Jev
-        </a>
       </header>
 
       {shown ? (
@@ -132,7 +129,7 @@ export function Studio({ initial }: { initial?: Shown | "loading" }) {
       ) : initial === "loading" ? (
         <div className="shimmer aspect-[1200/760] w-full rounded-2xl" />
       ) : (
-        <h1 className="text-[2rem] leading-tight font-extrabold tracking-tight text-balance">AI rates your pics.</h1>
+        <h1 className="text-[2rem] leading-tight font-extrabold tracking-tight text-balance">roasts by jev</h1>
       )}
 
       <section aria-label="Examples" className="-mx-4">
