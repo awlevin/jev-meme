@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     "/api/meme": ["./public/samples/**"],
     "/m/[id]/image.png": ["./public/samples/**", "./assets/fonts/**"],
     "/m/[id]/card.png": ["./public/samples/**", "./assets/fonts/**"],
+    "/icon": ["./assets/fonts/**"],
   },
 };
 
